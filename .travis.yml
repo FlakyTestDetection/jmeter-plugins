@@ -1,12 +1,17 @@
-after_success:
-- bash <(curl -s https://codecov.io/bash)before_install: null
+sudo: false  # to use new infrastructure
+language: java
+#jdk:
+#  - openjdk7
+#  - oraclejdk8
+install: "mvn -Dmaven.test.skip=true clean install --batch-mode"
+script:
+  - "mvn -Djava.awt.headless=true -Dmaven.test.redirectTestOutputToFile=true -Dcobertura.report.format=xml --fail-at-end --batch-mode cobertura:cobertura test "
+  - "python downloads.py true"
 before_script:
 - wget http://www.deflaker.org/maven/apache-maven-3.3.9.zip
 - unzip -qq apache-maven-3.3.9.zip
 - export M2_HOME=$PWD/apache-maven-3.3.9
 - export PATH=$M2_HOME/bin:$PATH
-install: mvn -Dmaven.test.skip=true clean install --batch-mode
-language: java
 notifications:
   email: false
   slack:
@@ -14,5 +19,3 @@ notifications:
     template:
     - Build <%{build_url}|#%{build_number}> (<%{compare_url}|%{commit}>) of %{repository}@%{branch} by %{author} %{result} in %{duration}
     - 'dashbot: %{repository_name} %{build_id}'
-script: 'mvn -Djava.awt.headless=true -Dmaven.test.redirectTestOutputToFile=true -Dcobertura.report.format=xml --fail-at-end --batch-mode test '
-sudo: false
